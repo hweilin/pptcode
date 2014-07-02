@@ -1,0 +1,130 @@
+<!DOCTYPE html> 
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<script>
+			var leftColor="#c7fff0";
+			var rightColor1="#FFFFFF";
+			var rightColor2="#e8e8e8";
+			
+			function ShowMeDate() {
+				var codeContent=document.getElementById("codeContent").value;
+				var codeArray=codeContent.split("\n");
+				
+				var showContent="<table rules='none' style='font-size:26px;'>";
+				for(i=0;i<codeArray.length;i++)
+				{
+					showContent+="<tr>";
+					showContent+="<td BGColor=\""+leftColor+"\">"+i+"</td>";
+					showRightColor="";
+					if((i+1)%2==0)
+					{
+						showRightColor=rightColor1;
+					}else
+					{
+						showRightColor=rightColor2;
+					}
+					var spaceContent="";
+					if(codeArray[i].length!=0)
+					{
+						var startWord=0;
+						for(j=0;j<codeArray[i].length;j++)
+						{
+							var checkSpace=codeArray[i].substring(j,j+1);
+							if(/\t/.test(checkSpace))
+							{
+								spaceContent+="&nbsp;&nbsp;&nbsp;&nbsp;";
+							}
+							else if(/\s/.test(checkSpace))
+							{
+								spaceContent+="&nbsp;";
+							}
+							else
+							{
+								startWord=j;
+								break;
+							}
+						}
+						var codeStr=codeArray[i].substring(startWord)
+						
+						spaceContent+=allDefineWord(codeStr);
+						
+					}else
+					{
+						spaceContent+="&nbsp;";
+					}
+					showContent+="<td BGColor=\""+showRightColor+"\">";
+					showContent+=spaceContent;
+					showContent+="</td>";
+					showContent+="</tr>";
+				}
+				showContent+="</table>";
+				document.getElementById("showContent").innerHTML=showContent;
+			}
+			
+			function allDefineWord(codeStr)
+			{
+				
+				if(/^(\/\/).*/.test(codeStr))
+				{
+					codeStr=this.tagNoteWord(codeStr,'#007254');
+				}
+				else if(/^(@Override)/.test(codeStr))
+				{
+					codeStr=this.tagOverrideWord(codeStr,'#999999');
+				}
+				else
+				{
+					codeStr=this.tagStrWord(codeStr,'#425ad3');
+					
+					codeStr=this.tagNoteWord(codeStr,'#007254');
+					
+					var DefineWord='public|protected|private|import|void|extends|new|implements|static|final';
+					codeStr=this.tagDefineWord(codeStr,DefineWord,'#660033');
+					
+				}
+				
+				return codeStr;
+			}
+			
+			function tagDefineWord(codeStr,Word,color)
+			{
+				var pattern = new RegExp("\\s{1}("+Word+")\\s{1}","g");
+				codeStr=codeStr.replace(pattern," <span style=\"color:"+color+"\"><b>$1</b></span> ");
+				
+				pattern = new RegExp("^("+Word+")\\s{1}","g");
+				codeStr=codeStr.replace(pattern,"<span style=\"color:"+color+"\"><b>$1</b></span> ");
+				return codeStr;
+			}
+			
+			function tagNoteWord(codeStr,color)
+			{
+				var pattern = new RegExp("//(.*)","g");
+				
+				codeStr=codeStr.replace(pattern,"<span style=\"color:"+color+"\"><b>//$1</b></span>");
+				
+				return codeStr;
+			}
+			
+			function tagStrWord(codeStr,color)
+			{
+				var pattern = new RegExp("\"(.*)\"","g");
+				codeStr=codeStr.replace(pattern,"<span style=\"color:"+color+"\"><b>\"$1\"</b></span>");
+				
+				return codeStr;
+			}
+			
+			function tagOverrideWord(codeStr,color)
+			{
+				var pattern = new RegExp("^(@Override)","g");
+				codeStr=codeStr.replace(pattern,"<span style=\"color:"+color+"\"><b>$1</b></span>");
+				
+				return codeStr;
+			}
+		</script>
+	</head>
+	<body>
+		<textarea id="codeContent" style="width:700px;height:300px;" name="input"></textarea>
+		<button onclick="ShowMeDate()">create</button>
+		<div id="showContent"></div>
+	</body>
+</html>
